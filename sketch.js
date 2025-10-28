@@ -1,48 +1,76 @@
-let valueSlider;
+//Slider für Hintergrundfarbe
+let sliderFarbe;
 
+//Slider für Eckenradius
+let sliderEcken;
 
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
+  rectMode(CENTER);
+  noStroke();
 
-//Slider mit Startwert und Bereich
-  valueSlider = createSlider(-10,38,9);
-  valueSlider.position(20,20);
+  //Slider mit Bereich und Startwert
+  sliderFarbe = createSlider(0, 100, 0);
+  sliderFarbe.position(20, 50);
+
+  sliderEcken = createSlider(0, 15, 0);
+  sliderEcken.position(20, 100);
 
 }
 
 function draw() {
 
-//Aktuellen Sliderwert lesen
-  let inputValue = valueSlider.value();
+  //Aktuelle Werte der Slider lesen
+  let farbe = sliderFarbe.value();
+  let radius = sliderEcken.value();
+
+  //Hintergrundfarbe von Schwarz zu Weiss mappen
+  let grau = map(farbe, 0, 100, 0, 255);
+  background(grau);
+
+  //Abstand der Maus zur Mitte
+  let abstandX = (mouseX - width / 2) / 10;
+  let abstandY = (mouseY - height / 2) / 10;
+
+  //Farben der Formen definieren
+  let blau = color(0, 200, 255);
+  let pink = color(230, 0, 130);
 
 
-// Min-Max range definieren
-  let inputMin = -10;
-  let inputMax = 38;
+  //Formen in wechselnder Farbe gelistet
+  fill(blau);
+  rect(width / 2, height / 2, 300, 300, radius);
 
-  let outputMin = 0; 
-  let outputMax = 255; 
+  fill(pink);
+  rect(width / 2 + abstandX * 1, height / 2 + abstandY * 1, 250, 250, radius);
 
-  let outputValue = map(inputValue, inputMin, inputMax, outputMin, outputMax)
+  fill(blau);
+  rect(width / 2 + abstandX * 2, height / 2 + abstandY * 2, 200, 200, radius);
 
-  //console.log(outputValue);
+  fill(pink);
+  rect(width / 2 + abstandX * 3, height / 2 + abstandY * 3, 150, 150, radius);
 
-  background(outputValue);
+  fill(blau);
+  rect(width / 2 + abstandX * 4, height / 2 + abstandY * 4, 100, 100, radius);
 
-  //let kreisoutputValue= map(inputValue,inputMin, outputMax, outputMin);
+  fill(pink);
+  rect(width / 2 + abstandX * 5, height / 2 + abstandY * 5, 50, 50, radius);
 
-  //background 0 , kreis 255
-  //background 255, kreis 0
-  //background 125, kreis 125
-  //background 100, kreis 155
+  //Beschriftungen der Slider
+  if (grau < 128) {
+    fill(255); // heller Text auf dunklem Hintergrund
+  } else {
+    fill(0);   // dunkler Text auf hellem Hintergrund
+  }
 
-  fill(255-outputValue);
-  noStroke()
-  ellipse(200,200,400,400);
-  fill(mouseX);
-  ellipse(200,200,300,300);
-  fill(mouseY)
-  ellipse(200,200,200,200);
-  
+  textSize(12);
+  text('Hintergrundfarbe', 160, 62);
+  text('Eckenradius', 160, 112);
+
+
+}
+//Canvas an die Fenstergrösse anpassen
+function windowResized() {
+  resizeCanvas(windowWidth, windowHeight);
 }
