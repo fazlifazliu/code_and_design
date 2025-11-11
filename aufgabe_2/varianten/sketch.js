@@ -5,6 +5,7 @@ let sliderFarbe;
 let sliderEcken;
 
 let drehwinkel = 0;
+let radius;
 
 
 function setup() {
@@ -26,39 +27,35 @@ function setup() {
 
 function draw() {
 
+  //randomSeed(200);
 
   //Aktuelle Werte der Slider lesen
   let farbe = sliderFarbe.value();
-  let radius = sliderEcken.value();
+  radius = sliderEcken.value();
 
   //Hintergrundfarbe von Schwarz zu Weiss mappen
   let grau = map(farbe, 0, 100, 0, 255);
   background(grau);
 
-  //Abstand der Maus zur Mitte
-  let abstandX = (mouseX - width / 2) / 10;
-  let abstandY = (mouseY - height / 2) / 10;
-
-  //Farben der Formen definieren
-  let blau = color(0, 200, 255);
-  let pink = color(230, 0, 130);
-
-  for (let i = 0; i < 6; i++) {
-    let faktor = 6 - i;
+  for (let i = 0; i < 3; i++) {
     push();
-    translate(width / 2 + abstandX * i, height / 2 + abstandY * i);
+    let PosX = i * width / 2;
+    let PosY = height / 2;
 
+    translate(PosX, PosY);
+    let form;
     if (i % 2 == 0) {
-      rotate(drehwinkel);
-      fill(blau);
+      form = "ellipse";
     } else {
-      rotate(drehwinkel * -1);
-      fill(pink);
+      form = "rechteck";
     }
-
-    rect(0, 0, faktor * 80, faktor * 80, radius);
+    magnete(PosX, PosY, form);
     pop();
   }
+
+
+
+
 
   //Beschriftungen der Slider
   if (grau < 128) {
@@ -71,11 +68,43 @@ function draw() {
   text('Hintergrundfarbe', 160, 62);
   text('Eckenradius', 160, 112);
 
-  drehwinkel = drehwinkel + 0.2;
+  drehwinkel = drehwinkel + 0.1;
 }
 //Canvas an die Fenstergrösse anpassen
 function windowResized() {
   resizeCanvas(windowWidth, windowHeight);
 
 
+}
+
+
+function magnete(mittelpunktX, mittelpunktY, form) {
+  //Abstand der Maus zur Mitte
+  let abstandX = (mouseX - mittelpunktX) / 30;
+  let abstandY = (mouseY - mittelpunktY) / 30;
+
+  //Farben der Formen definieren
+  let blau = color(0, 200, 255);
+  let pink = color(230, 0, 130);
+  for (let i = 0; i < 10; i++) {
+    let faktor = 10 - i;
+    push();
+    translate(abstandX * i, abstandY * i);
+
+    if (i % 2 == 0) {
+      rotate(drehwinkel);
+      fill(blau);
+    } else {
+      rotate(drehwinkel * 1);
+      fill(pink);
+    }
+
+    if (form == "rechteck") {
+      rect(0, 0, faktor * 50, faktor * 50, radius);
+    } else {
+      ellipse(0, 0, faktor * 55, faktor * 50)
+    }
+
+    pop();
+  }
 }

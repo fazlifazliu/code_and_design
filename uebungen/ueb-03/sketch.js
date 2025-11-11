@@ -33,7 +33,7 @@ function draw() {
 
 
 
-  rect(posX, posY, 3, 30, 2);
+  rect(posX, posY, 3, 300, 2);
   //rect(posY, posX, 30, 3, 2); // 
 
   /*fill(0);
