@@ -27,7 +27,6 @@ function setup() {
 
 function draw() {
 
-  //randomSeed(200);
 
   //Aktuelle Werte der Slider lesen
   let farbe = sliderFarbe.value();
@@ -52,10 +51,6 @@ function draw() {
     magnete(PosX, PosY, form);
     pop();
   }
-
-
-
-
 
   //Beschriftungen der Slider
   if (grau < 128) {

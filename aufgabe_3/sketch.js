@@ -5,10 +5,13 @@ let video;
 let hands = [];
 let isReady = false;
 
+// Indizes der wichtigen Handpunkte 
 const WRIST = 0;
 const THUMB_TIP = 4;
 const INDEX_TIP = 8;
 const MIDDLE_TIP = 12;
+
+// Fingerpfade: welche Punkte pro Finger verbunden werden
 const FINGER_PATHS = [
   [1, 2, 3, 4],
   [5, 6, 7, 8],
@@ -30,12 +33,14 @@ const WIPE_INDICES = [
   { index: 20, scale: 0.8 }
 ];
 
+//Punkte der Handfläche für das Ausfüllen
 const PALM_LOOP = [WRIST, 1, 2, 5, 9, 13, 17];
 
+// Nebelschicht und Wischspur
 let fogLayer;
 let prevWipePos = null;
 let drips = [];
-let fogDensity = 0.8;
+let fogDensity = 0.8; //Dichte des Nebels 0= klar, 1= dicht
 let smoothing = 0.2;
 
 function preload() {
@@ -46,6 +51,7 @@ function setup() {
   createCanvas(windowWidth, windowHeight);
   pixelDensity(1);
 
+  //Webcam einrichten 
   video = createCapture(VIDEO);
   video.size(640, 480);
   video.hide();
@@ -54,12 +60,15 @@ function setup() {
   fogLayer.pixelDensity(1);
   initFogTexture();
 
+  //Handpose-Tracking starten
   handpose.detectStart(video, gotHands);
 }
 
 function initFogTexture() {
   fogLayer.push();
   fogLayer.clear();
+
+  //Grundfarbe des beschlagenen Spiegels
   let baseCol = color(205, 215, 225, 235);
   fogLayer.background(baseCol);
   fogLayer.noStroke();
@@ -85,12 +94,16 @@ function draw() {
   applySteamFilm();
 
   let wiped = false;
+
+  //Wenn eine Hand erkannt wurde, Nebel wischen
   if (isReady && hands.length > 0) {
     let hand = hands[0];
     wiped = wipeFogWithHand(hand);
   } else {
     prevWipePos = null;
   }
+
+  //Nebel dichter werden lassen, wenn nicht gewischt wird
   if (!wiped) {
     fogDensity = lerp(fogDensity, 0.5, 0.003);
   }
@@ -118,6 +131,7 @@ function applySteamFilm() {
   fogLayer.pop();
 }
 
+//Kernfunktion: Nebel mit Hand wischen
 function wipeFogWithHand(hand) {
   let tip = hand.keypoints[INDEX_TIP];
   let wrist = hand.keypoints[WRIST];
@@ -135,6 +149,7 @@ function wipeFogWithHand(hand) {
   let wipeSpeed = prevWipePos ? dist(pointer.x, pointer.y, prevWipePos.x, prevWipePos.y) : 0;
   baseRadius += wipeSpeed * 0.3;
 
+  //Auf dem Nebel-Layer mit erase-Modus zeichnen => Nebel wird durchsichtig
   fogLayer.push();
   fogLayer.erase(255, 0);
   fogLayer.noFill();
@@ -142,6 +157,8 @@ function wipeFogWithHand(hand) {
   fogLayer.strokeWeight(baseRadius * 0.5);
   fogLayer.strokeCap(ROUND);
   fogLayer.strokeJoin(ROUND);
+
+  //Fingerpfade als zusammenhängende Linien zeichnen
   for (let path of FINGER_PATHS) {
     let pts = [];
     for (let idx of path) {
@@ -157,7 +174,9 @@ function wipeFogWithHand(hand) {
     fogLayer.endShape();
   }
   fogLayer.noStroke();
-  for (let spec of WIPE_INDICES) {
+
+  //Wischkreise an wichtigen Punkten zeichnen
+    for (let spec of WIPE_INDICES) {
     let kp = hand.keypoints[spec.index];
     if (!kp) continue;
     let pos = getScreenPosition(kp.x, kp.y);
@@ -184,6 +203,7 @@ function wipeFogWithHand(hand) {
   fogLayer.noErase();
   fogLayer.pop();
 
+  //Bei schnellem Wischen Tropfen erzeugen
   if (wipeSpeed > 18) {
     for (let i = 0; i < 3; i++) {
       drips.push(new DripParticle(pointer.x + random(-20, 20), pointer.y + random(-10, 15)));
@@ -213,6 +233,8 @@ function drawDrips() {
     drip.draw();
   }
 }
+
+//Hinweistext unten links
 
 function drawStatusHint() {
   noStroke();
